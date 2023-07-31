@@ -13,7 +13,7 @@ wget https://zenodo.org/record/6047984/files/casf2016_scoring.tar.gz?download=1 
 cd $SCORING_DIR
 tar -xzf data.tar.gz
 ../../generate_keys.py -d data -k keys -c ../../coreset_keys.txt
-../../pdb_to_affinity.py -d data -f pdb_to_affinity.txt -i ../../CoreSet.dat --benchmark
+../../pdb_to_affinity.py -d data -f pdb_to_affinity.txt -i ../../../casf2016_benchmark/CoreSet.dat --benchmark
 cd -
 echo "Downloaded, unpacked and processed casf2016 scoring data."
 
@@ -22,7 +22,7 @@ wget https://zenodo.org/record/6047984/files/casf2016_docking.tar.gz?download=1 
 cd $DOCKING_DIR
 tar -xzf data.tar.gz
 ../../generate_keys.py -d data -k keys -c ../../coreset_keys.txt
-../../pdb_to_affinity.py -d data -f pdb_to_affinity.txt -i ../../CoreSet.dat --benchmark
+../../pdb_to_affinity.py -d data -f pdb_to_affinity.txt -i ../../../casf2016_benchmark/CoreSet.dat --benchmark
 cd -
 echo "Downloaded, unpacked and processed casf2016 docking data."
 
@@ -31,6 +31,6 @@ wget https://zenodo.org/record/6047984/files/casf2016_screening.tar.gz?download=
 cd $SCREENING_DIR
 tar -xzf data.tar.gz
 ../../generate_keys.py -d data -k keys -c ../../coreset_keys.txt
-../../pdb_to_affinity.py -d data -f pdb_to_affinity.txt -i ../../CoreSet.dat --benchmark --screening
+../../pdb_to_affinity.py -d data -f pdb_to_affinity.txt -i ../../../casf2016_benchmark/CoreSet.dat --benchmark --screening
 cd -
 echo "Downloaded, unpacked and processed casf2016 screening data."
