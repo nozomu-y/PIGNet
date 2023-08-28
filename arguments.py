@@ -154,10 +154,10 @@ def parser(command):
             default="train_result.txt",
         )
         parser.add_argument(
-            "--test_result_filename",
-            help="test result filename",
+            "--valid_result_filename",
+            help="valid result filename",
             type=str,
-            default="test_result.txt",
+            default="valid_result.txt",
         )
         parser.add_argument(
             "--train_result_docking_filename",
@@ -166,10 +166,10 @@ def parser(command):
             default="train_result_docking.txt",
         )
         parser.add_argument(
-            "--test_result_docking_filename",
-            help="test result docking filename",
+            "--valid_result_docking_filename",
+            help="valid result docking filename",
             type=str,
-            default="test_result_docking.txt",
+            default="valid_result_docking.txt",
         )
         parser.add_argument(
             "--train_result_screening_filename",
@@ -178,10 +178,10 @@ def parser(command):
             default="train_result_screening.txt",
         )
         parser.add_argument(
-            "--test_result_screening_filename",
-            help="test result screening filename",
+            "--valid_result_screening_filename",
+            help="valid result screening filename",
             type=str,
-            default="test_result_screening.txt",
+            default="valid_result_screening.txt",
         )
         parser.add_argument(
             "--loss_der1_ratio",

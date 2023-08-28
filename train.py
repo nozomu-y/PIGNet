@@ -178,10 +178,10 @@ cmd = utils.set_cuda_visible_device(args.ngpu)
 os.environ["CUDA_VISIBLE_DEVICES"] = cmd
 
 # Read labels
-train_keys, test_keys, id_to_y = utils.read_data(args.filename, args.key_dir)
-train_keys2, test_keys2, id_to_y2 = utils.read_data(args.filename2, args.key_dir2)
-train_keys3, test_keys3, id_to_y3 = utils.read_data(args.filename3, args.key_dir3)
-train_keys4, test_keys4, id_to_y4 = utils.read_data(args.filename4, args.key_dir4)
+train_keys, valid_keys, id_to_y = utils.read_data(args.filename, args.key_dir)
+train_keys2, valid_keys2, id_to_y2 = utils.read_data(args.filename2, args.key_dir2)
+train_keys3, valid_keys3, id_to_y3 = utils.read_data(args.filename3, args.key_dir3)
+train_keys4, valid_keys4, id_to_y4 = utils.read_data(args.filename4, args.key_dir4)
 
 # Model
 if args.model == "pignet":
@@ -205,26 +205,26 @@ if not args.restart_file:
 train_dataset, train_dataloader = get_dataset_dataloader(
     train_keys, args.data_dir, id_to_y, args.batch_size, args.num_workers
 )
-test_dataset, test_dataloader = get_dataset_dataloader(
-    test_keys, args.data_dir, id_to_y, args.batch_size, args.num_workers, False
+valid_dataset, valid_dataloader = get_dataset_dataloader(
+    valid_keys, args.data_dir, id_to_y, args.batch_size, args.num_workers, False
 )
 train_dataset2, train_dataloader2 = get_dataset_dataloader(
     train_keys2, args.data_dir2, id_to_y2, args.batch_size, args.num_workers
 )
-test_dataset2, test_dataloader2 = get_dataset_dataloader(
-    test_keys2, args.data_dir2, id_to_y2, args.batch_size, args.num_workers, False
+valid_dataset2, valid_dataloader2 = get_dataset_dataloader(
+    valid_keys2, args.data_dir2, id_to_y2, args.batch_size, args.num_workers, False
 )
 train_dataset3, train_dataloader3 = get_dataset_dataloader(
     train_keys3, args.data_dir3, id_to_y3, args.batch_size, args.num_workers
 )
-test_dataset3, test_dataloader3 = get_dataset_dataloader(
-    test_keys3, args.data_dir3, id_to_y3, args.batch_size, args.num_workers, False
+valid_dataset3, valid_dataloader3 = get_dataset_dataloader(
+    valid_keys3, args.data_dir3, id_to_y3, args.batch_size, args.num_workers, False
 )
 train_dataset4, train_dataloader4 = get_dataset_dataloader(
     train_keys4, args.data_dir4, id_to_y4, args.batch_size, args.num_workers
 )
-test_dataset4, test_dataloader4 = get_dataset_dataloader(
-    test_keys4, args.data_dir4, id_to_y4, args.batch_size, args.num_workers, False
+valid_dataset4, valid_dataloader4 = get_dataset_dataloader(
+    valid_keys4, args.data_dir4, id_to_y4, args.batch_size, args.num_workers, False
 )
 
 # Optimizer and loss
@@ -251,11 +251,11 @@ for epoch in range(restart_epoch, args.num_epochs):
         train_losses_screening,
     ) = ([], [], [], [], [])
     (
-        test_losses,
-        test_losses_der1,
-        test_losses_der2,
-        test_losses_docking,
-        test_losses_screening,
+        valid_losses,
+        valid_losses_der1,
+        valid_losses_der2,
+        valid_losses_docking,
+        valid_losses_screening,
     ) = ([], [], [], [], [])
 
     (
@@ -267,12 +267,12 @@ for epoch in range(restart_epoch, args.num_epochs):
         train_true_screening,
     ) = (dict(), dict(), dict(), dict(), dict(), dict())
     (
-        test_pred,
-        test_true,
-        test_pred_docking,
-        test_true_docking,
-        test_pred_screening,
-        test_true_screening,
+        valid_pred,
+        valid_true,
+        valid_pred_docking,
+        valid_true_docking,
+        valid_pred_screening,
+        valid_true_screening,
     ) = (dict(), dict(), dict(), dict(), dict(), dict())
 
     # iterator
@@ -282,11 +282,11 @@ for epoch in range(restart_epoch, args.num_epochs):
         iter(train_dataloader3),
         iter(train_dataloader4),
     )
-    test_data_iter, test_data_iter2, test_data_iter3, test_data_iter4 = (
-        iter(test_dataloader),
-        iter(test_dataloader2),
-        iter(test_dataloader3),
-        iter(test_dataloader4),
+    valid_data_iter, valid_data_iter2, valid_data_iter3, valid_data_iter4 = (
+        iter(valid_dataloader),
+        iter(valid_dataloader2),
+        iter(valid_dataloader3),
+        iter(valid_dataloader4),
     )
 
     # Train
@@ -311,25 +311,25 @@ for epoch in range(restart_epoch, args.num_epochs):
         True,
     )
 
-    # Test
+    # valid
     (
-        test_losses,
-        test_losses_der1,
-        test_losses_der2,
-        test_losses_docking,
-        test_losses_screening,
-        test_pred,
-        test_true,
-        test_pred_docking,
-        test_true_docking,
-        test_pred_screening,
-        test_true_screening,
+        valid_losses,
+        valid_losses_der1,
+        valid_losses_der2,
+        valid_losses_docking,
+        valid_losses_screening,
+        valid_pred,
+        valid_true,
+        valid_pred_docking,
+        valid_true_docking,
+        valid_pred_screening,
+        valid_true_screening,
     ) = run(
         model,
-        test_data_iter,
-        test_data_iter2,
-        test_data_iter3,
-        test_data_iter4,
+        valid_data_iter,
+        valid_data_iter2,
+        valid_data_iter3,
+        valid_data_iter4,
         False,
     )
 
@@ -346,13 +346,13 @@ for epoch in range(restart_epoch, args.num_epochs):
         epoch,
     )
     writer.add_scalars(
-        "test",
+        "valid",
         {
-            "loss": test_losses,
-            "loss_der1": test_losses_der1,
-            "loss_der2": test_losses_der2,
-            "loss_docking": test_losses_docking,
-            "loss_screening": test_losses_screening,
+            "loss": valid_losses,
+            "loss_der1": valid_losses_der1,
+            "loss_der2": valid_losses_der2,
+            "loss_docking": valid_losses_docking,
+            "loss_screening": valid_losses_screening,
         },
         epoch,
     )
@@ -364,9 +364,9 @@ for epoch in range(restart_epoch, args.num_epochs):
         train_true,
     )
     utils.write_result(
-        args.test_result_filename,
-        test_pred,
-        test_true,
+        args.valid_result_filename,
+        valid_pred,
+        valid_true,
     )
     utils.write_result(
         args.train_result_docking_filename,
@@ -374,9 +374,9 @@ for epoch in range(restart_epoch, args.num_epochs):
         train_true_docking,
     )
     utils.write_result(
-        args.test_result_docking_filename,
-        test_pred_docking,
-        test_true_docking,
+        args.valid_result_docking_filename,
+        valid_pred_docking,
+        valid_true_docking,
     )
     utils.write_result(
         args.train_result_screening_filename,
@@ -384,9 +384,9 @@ for epoch in range(restart_epoch, args.num_epochs):
         train_true_screening,
     )
     utils.write_result(
-        args.test_result_screening_filename,
-        test_pred_screening,
-        test_true_screening,
+        args.valid_result_screening_filename,
+        valid_pred_screening,
+        valid_true_screening,
     )
     end = time.time()
 
@@ -395,15 +395,15 @@ for epoch in range(restart_epoch, args.num_epochs):
         [train_true[k] for k in train_true.keys()],
         [train_pred[k].sum() for k in train_true.keys()],
     )
-    test_r2 = r2_score(
-        [test_true[k] for k in test_true.keys()],
-        [test_pred[k].sum() for k in test_true.keys()],
+    valid_r2 = r2_score(
+        [valid_true[k] for k in valid_true.keys()],
+        [valid_pred[k].sum() for k in valid_true.keys()],
     )
 
     # Cal R
-    _, _, test_r, _, _ = stats.linregress(
-        [test_true[k] for k in test_true.keys()],
-        [test_pred[k].sum() for k in test_true.keys()],
+    _, _, valid_r, _, _ = stats.linregress(
+        [valid_true[k] for k in valid_true.keys()],
+        [valid_pred[k].sum() for k in valid_true.keys()],
     )
     _, _, train_r, _, _ = stats.linregress(
         [train_true[k] for k in train_true.keys()],
@@ -413,19 +413,19 @@ for epoch in range(restart_epoch, args.num_epochs):
     if epoch == 0:
         print(
             "epoch\ttrain_l\ttrain_l_der1\ttrain_l_der2\ttrain_l_docking\t"
-            + "train_l_screening\ttest_l\ttest_l_der1\ttest_l_der2\t"
-            + "test_l_docking\ttest_l_screening\t"
-            + "train_r2\ttest_r2\ttrain_r\ttest_r\ttime"
+            + "train_l_screening\tvalid_l\tvalid_l_der1\tvalid_l_der2\t"
+            + "valid_l_docking\tvalid_l_screening\t"
+            + "train_r2\tvalid_r2\ttrain_r\tvalid_r\ttime"
         )
     print(
         f"{epoch}\t{train_losses:.3f}\t{train_losses_der1:.3f}\t"
         + f"{train_losses_der2:.3f}\t{train_losses_docking:.3f}\t"
         + f"{train_losses_screening:.3f}\t"
-        + f"{test_losses:.3f}\t{test_losses_der1:.3f}\t"
-        + f"{test_losses_der2:.3f}\t{test_losses_docking:.3f}\t"
-        + f"{test_losses_screening:.3f}\t"
-        + f"{train_r2:.3f}\t{test_r2:.3f}\t"
-        + f"{train_r:.3f}\t{test_r:.3f}\t{end-st:.3f}"
+        + f"{valid_losses:.3f}\t{valid_losses_der1:.3f}\t"
+        + f"{valid_losses_der2:.3f}\t{valid_losses_docking:.3f}\t"
+        + f"{valid_losses_screening:.3f}\t"
+        + f"{train_r2:.3f}\t{valid_r2:.3f}\t"
+        + f"{train_r:.3f}\t{valid_r:.3f}\t{end-st:.3f}"
     )
 
     name = os.path.join(args.save_dir, "save_" + str(epoch) + ".pt")

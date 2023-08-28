@@ -78,14 +78,14 @@ def read_data(
         lines = f.readlines()
         lines = [l.split() for l in lines]
         id_to_y = {l[0]: float(l[1]) for l in lines}
-    with open(f"{key_dir}/test_keys.pkl", "rb") as f:
-        test_keys = pickle.load(f)
+    with open(f"{key_dir}/validate_keys.pkl", "rb") as f:
+        valid_keys = pickle.load(f)
     if train:
         with open(f"{key_dir}/train_keys.pkl", "rb") as f:
             train_keys = pickle.load(f)
-        return train_keys, test_keys, id_to_y
+        return train_keys, valid_keys, id_to_y
     else:
-        return test_keys, id_to_y
+        return valid_keys, id_to_y
 
 
 def write_result(

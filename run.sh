@@ -1,4 +1,4 @@
-export EXP=PIGNet
+export EXP=PIGNet_birch_cluster_valid
 python -u ./train.py \
 --batch_size=8 \
 --save_every=100 \
@@ -8,11 +8,11 @@ python -u ./train.py \
 --dim_gnn=128 \
 --ngpu=1 \
 --train_result_filename=result/"$EXP"_train.txt \
---test_result_filename=result/"$EXP"_test.txt \
+--valid_result_filename=result/"$EXP"_valid.txt \
 --train_result_docking_filename=result/"$EXP"_train_docking.txt \
---test_result_docking_filename=result/"$EXP"_test_docking.txt \
+--valid_result_docking_filename=result/"$EXP"_valid_docking.txt \
 --train_result_screening_filename=result/"$EXP"_train_screening.txt \
---test_result_screening_filename=result/"$EXP"_test_screening.txt \
+--valid_result_screening_filename=result/"$EXP"_valid_screening.txt \
 --loss_der1_ratio=10.0 \
 --loss_der2_ratio=10.0 \
 --min_loss_der2=-20.0 \

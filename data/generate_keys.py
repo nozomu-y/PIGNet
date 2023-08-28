@@ -20,16 +20,25 @@ def arguments() -> Namespace:
         type=str,
     )
     parser.add_argument(
-        "-c",
-        "--coreset_key_file",
-        help="casf 2016 coreset keys from http://www.pdbbind.org.cn/casf.php",
+        "--train_key_file",
         type=str,
+        required=True,
     )
     parser.add_argument(
-        "--train",
-        action="store_true",
-        help="generate train keys",
+        "--validate_key_file",
+        type=str,
+        required=True,
     )
+    parser.add_argument(
+        "--test_key_file",
+        type=str,
+        required=True,
+    )
+    # parser.add_argument(
+    #     "--train",
+    #     action="store_true",
+    #     help="generate train keys",
+    # )
     args, _ = parser.parse_known_args()
     return args
 
@@ -42,19 +51,19 @@ def write_keys(keys: List[str], file: str) -> None:
 
 def main(args: Namespace) -> None:
     keys = os.listdir(args.data_dir)
-    with open(args.coreset_key_file, "r") as f:
-        coreset_keys = [line.split()[0] for line in f.readlines()]
+    with open(args.train_key_file, "r") as f:
+        train_keys = [line.split()[0] for line in f.readlines()]
+    with open(args.validate_key_file, "r") as f:
+        validate_keys = [line.split()[0] for line in f.readlines()]
+    with open(args.test_key_file, "r") as f:
+        test_keys = [line.split()[0] for line in f.readlines()]
 
-    train_keys = []
-    test_keys = []
-    for key in keys:
-        if key.split("_")[0] in coreset_keys:
-            test_keys.append(key)
-        else:
-            train_keys.append(key)
+    train_keys = [key for key in keys if key.split('_')[0] in train_keys]
+    validate_keys = [key for key in keys if key.split('_')[0] in validate_keys]
+    test_keys = [key for key in keys if key.split('_')[0] in test_keys]
 
-    if args.train:
-        write_keys(train_keys, os.path.join(args.key_dir, "train_keys.pkl"))
+    write_keys(train_keys, os.path.join(args.key_dir, "train_keys.pkl"))
+    write_keys(validate_keys, os.path.join(args.key_dir, "validate_keys.pkl"))
     write_keys(test_keys, os.path.join(args.key_dir, "test_keys.pkl"))
     return
 
